@@ -1,0 +1,58 @@
+name: Deploy Discord Bot
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      DISCORD_TOKEN: ${{ secrets.DISCORD_TOKEN }}
+      POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+      POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+      POSTGRES_HOST: ${{ vars.POSTGRES_HOST }}
+      POSTGRES_PORT: ${{ vars.POSTGRES_PORT }}
+      POSTGRES_DB: ${{ vars.POSTGRES_DB }}
+      REDIS_HOST: ${{ vars.REDIS_HOST }}
+      REDIS_PORT: ${{ vars.REDIS_PORT }}
+      GUILD_ID: ${{ vars.GUILD_ID }}
+      OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+      STEAM_API_KEY: ${{ secrets.STEAM_API_KEY }}
+      DB_URL: postgresql://${{ secrets.POSTGRES_USER}}:${{ secrets.POSTGRES_PASSWORD}}@${{ vars.POSTGRES_HOST}}:${{ vars.POSTGRES_PORT }}/${{ vars.POSTGRES_DB }}
+    steps:
+    - name: Deploy to VPS
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ vars.VPS_HOST }}
+        username: ${{ vars.VPS_USERNAME }}
+        password: ${{ secrets.VPS_SSH_KEY }}
+        script: |
+          cd ~/divide_cups
+          git reset --hard
+          git pull origin main
+
+          rm -rf .env
+
+          echo "DISCORD_TOKEN=${{ secrets.DISCORD_TOKEN }}" >> .env
+          echo "POSTGRES_USER=${{ secrets.POSTGRES_USER }}" >> .env
+          echo "POSTGRES_PASSWORD=${{ secrets.POSTGRES_PASSWORD }}" >> .env
+          echo "POSTGRES_HOST=${{ vars.POSTGRES_HOST }}" >> .env
+          echo "POSTGRES_PORT=${{ vars.POSTGRES_PORT }}" >> .env
+          echo "POSTGRES_DB=${{ vars.POSTGRES_DB }}" >> .env
+          echo "REDIS_HOST=${{ vars.REDIS_HOST }}" >> .env
+          echo "REDIS_PORT=${{ vars.REDIS_PORT }}" >> .env
+          echo "GUILD_ID=${{ vars.GUILD_ID }}" >> .env
+          echo "OPENAI_API_KEY=${{ secrets.OPENAI_API_KEY }}" >> .env
+          echo "DB_URL=postgresql://${{ secrets.POSTGRES_USER}}:${{ secrets.POSTGRES_PASSWORD}}@${{ vars.POSTGRES_HOST}}:${{ vars.POSTGRES_PORT }}/${{ vars.POSTGRES_DB }}" >> .env
+          echo "STEAM_API_KEY=${{ secrets.STEAM_API_KEY }}" >> .env
+
+          docker compose build --no-cache
+          docker compose up -d
+
+          sleep 10
+
+          docker compose logs discord-bot
+
+          docker compose exec -T discord-bot npx drizzle-kit migrate

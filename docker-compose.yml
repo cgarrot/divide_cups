@@ -1,0 +1,50 @@
+services:
+  postgres:
+    image: postgres:latest
+    restart: always
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    ports:
+      - '${POSTGRES_PORT:-5432}:5432'
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+
+  redis:
+    image: redis:latest
+    restart: always
+    ports:
+      - '${REDIS_PORT:-6379}:6379'
+    volumes:
+      - redisdata:/data
+
+  # discord-bot:
+  #   build:
+  #     context: .
+  #     dockerfile: Dockerfile
+  #   image: discord-bot:latest
+  #   restart: always
+  #   ports:
+  #     - '3001:3001'
+  #   environment:
+  #     - NODE_ENV=production
+  #     - DISCORD_TOKEN=${DISCORD_TOKEN}
+  #     - POSTGRES_USER=${POSTGRES_USER}
+  #     - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+  #     - POSTGRES_HOST=${POSTGRES_HOST}
+  #     - POSTGRES_PORT=${POSTGRES_PORT:-5432}
+  #     - POSTGRES_DB=${POSTGRES_DB}
+  #     - REDIS_HOST=${REDIS_HOST:-redis}
+  #     - REDIS_PORT=${REDIS_PORT:-6379}
+  #     - GUILD_ID=${GUILD_ID}
+  #     - OPENAI_API_KEY=${OPENAI_API_KEY}
+  #     - DB_URL=${DB_URL}
+  #     - STEAM_API_KEY=${STEAM_API_KEY}
+  #   depends_on:
+  #     - postgres
+  #     - redis
+
+volumes:
+  pgdata:
+  redisdata:
