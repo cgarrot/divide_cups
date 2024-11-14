@@ -1,4 +1,4 @@
-# Divide Cup Discord Bot
+# Divide Cup Discord Bot for Spectre Divide
 
 <p align="center">
   <img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" />
