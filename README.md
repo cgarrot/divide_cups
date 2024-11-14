@@ -59,8 +59,8 @@ A Discord bot built with NestJS for managing esports tournaments and team compet
 
 1. Clone the repository
 ```bash
-git clone https://github.com/yourusername/divide-cup.git
-cd divide-cup
+git clone https://github.com/cgarrot/divide_cups.git
+cd divide_cups
 ```
 
 2. Install dependencies
@@ -90,6 +90,13 @@ STEAM_API_KEY=your_steam_api_key
 pnpm migrate
 ```
 
+# Docker
+
+## Deploy database and redis
+
+```bash
+docker-compose up -d
+```
 
 
 ## Bot Commands
@@ -107,3 +114,6 @@ pnpm migrate
 - `!sync-users` - Synchronize users
 - `!force-cleanup` - Clean up roles/channels
 
+## Related Projects
+
+- [Tournament Bracket Frontend](https://github.com/cgarrot/divide_cups_front) - React-based tournament bracket visualization system
